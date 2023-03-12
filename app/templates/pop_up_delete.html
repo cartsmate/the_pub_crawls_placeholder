@@ -1,0 +1,41 @@
+{% extends 'navbar.html' %}
+
+{% block title %}Duplicate Pub{% endblock %}
+
+{% block script %}
+
+<script>
+    function okButton(pub_id) {
+        axios.post(pub_id );
+    }
+
+    function cancelButton(pub_id) {
+        axios.get('pub/' + pub_id );
+    }
+
+    function onLoad() {
+
+        pub_review = {{ pub_review | tojson }}
+        if (isNaN(pub_review[0]['review_identity'])) {
+            text = " has an associated review. "
+        } else {
+            text = " has not yet been reviewed. "
+        }
+        if (confirm(pub_review[0]['name'] + text + "Are you sure you want to delete?")) {
+            okButton(pub_review[0]['pub_identity'])
+        } else {
+            cancelButton(pub_review[0]['pub_identity'])
+        }
+    }
+
+</script>
+{% endblock %}
+
+{% block pub_add_btn %}{% endblock %}
+{% block pub_read_btn %}{% endblock %}
+{% block pub_edit_btn %}{% endblock %}
+{% block pub_del_btn %}<a class="nav-link active" href="{{ url_for('pub_delete', pub_id=pub_review[0]['pub_identity']) }}">Delete</a>{% endblock %}
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}

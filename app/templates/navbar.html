@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="/testbed">Test</a></li>
+        <li class="nav-item">   {% block navbar_home %}
+            <a class="nav-link" href="/index">Home</a>{% endblock %}</li>
+        <li class="nav-item">   {% block navbar_map %}
+            <a class="nav-link" href="/pub/map/stations">Map View</a>{% endblock %}</li>
+        <li class="nav-item">   {% block navbar_list %}
+            <a class="nav-link" href="/pub/list">Listing</a>{% endblock %}</li>
+        <li class="nav-item">   {% block pub_add_btn %}
+            <a class="nav-link" href="{{ url_for('pub_add') }}">Add New Venue</a>{% endblock %}</li>
+        <li class="nav-item">   {% block pub_read_btn %}
+            <a class="nav-link" href="{{ url_for('pub', pub_id=pub_review[0]['pub_identity']) }}">View</a>{% endblock %}</li>
+        <li class="nav-item">   {% block pub_edit_btn %}
+            <a class="nav-link" href="{{ url_for('pub_edit', pub_id=pub_review[0]['pub_identity']) }}">Edit</a>{% endblock %}</li>
+        <li class="nav-item">   {% block pub_del_btn %}
+            <a class="nav-link" href="{{ url_for('pub_delete', pub_id=pub_review[0]['pub_identity']) }}">Delete</a>{% endblock %}</li>
+        <li class="nav-item">   {% block rev_read_btn %}
+            <a class="nav-link" href="{{ url_for('review', pub_id=pub_review[0]['pub_identity']) }}">Review</a>{% endblock %}</li>
+        <li class="nav-item">   {% block rev_add_btn %}
+            <a class="nav-link" href="{{ url_for('review_add', pub_id=pub_review[0]['pub_identity']) }}">Add Review</a>{% endblock %}</li>
+        <li class="nav-item">   {% block rev_edit_btn %}
+            <a class="nav-link" href="{{ url_for('review_edit', pub_id=pub_review[0]['pub_identity']) }}">Edit Review</a>{% endblock %}</li>
+        <li class="nav-item">   {% block rev_del_btn %}
+            <a class="nav-link" href="{{ url_for('review_delete', pub_id=pub[0]['identity']) }}">Delete Review</a>{% endblock %}</li>
+        <li class="nav-item">   {% block search_btn %}
+            <input id="search-input-navbar" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">{% endblock %}</li></ul>
+<!--            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+    </div>
+</nav>
+{% endblock %}

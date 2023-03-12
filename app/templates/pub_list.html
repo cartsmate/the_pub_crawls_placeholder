@@ -1,0 +1,127 @@
+{% extends 'navbar.html' %}
+
+{% block title %}Listing View{% endblock %}
+
+{% block script %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/jquery.dataTables.min.css') }}">
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/create_table.js') }}"></script>
+<script>
+function onLoad(){
+    console.log("onLoad in pub_list");
+    var map_lat = {{ map_lat | tojson }}
+    var map_lng = {{ map_lng | tojson }}
+    var map_view = {{ map_view | tojson }}
+    //console.log('map_lat: ' + map_lat)
+    //console.log('map_lng: ' + map_lng)
+    //console.log('map_view: ' + map_view)
+    pubs_reviews = {{ pubs_reviews | tojson }};
+    switch(map_view) {
+        case 'list':
+            document.getElementById("location").checked = true;
+            Station()
+            break;
+        case 'station':
+            document.getElementById("location").checked = true;
+            Station()
+            break;
+        case 'category':
+            document.getElementById("type").checked = true;
+            Type()
+            break;
+        case 'star':
+            document.getElementById("star").checked = true;
+            Star()
+            break;
+        default:
+            document.getElementById("location").checked = true;
+            Station()
+            break;
+        }
+}
+
+function Station() {
+    document.getElementById("table-pubs-json").innerHTML = create_table(pubs_reviews)
+    $(document).ready(function () {
+        $('#pub_list').DataTable({
+            order: [[5, 'desc']],
+            columnDefs: [
+                    {target: 1, visible: false, searchable: false, },
+                    {target: 3, visible: false, searchable: false, },
+                        ]
+        });
+    });
+}
+
+function Type() {
+    document.getElementById("table-pubs-json").innerHTML = create_table(pubs_reviews)
+    $(document).ready(function () {
+        $('#pub_list').DataTable({
+            order: [[5, 'desc']],
+            columnDefs: [
+                    {target: 2, visible: false, searchable: false, },
+                    {target: 3, visible: false, searchable: false, },
+                        ]
+        });
+    });
+}
+
+function Star() {
+    document.getElementById("table-pubs-json").innerHTML = create_table(pubs_reviews)
+    $(document).ready(function () {
+        $('#pub_list').DataTable({
+            order: [[5, 'desc']],
+            columnDefs: [
+                    {target: 1, visible: false, searchable: false, },
+                    {target: 2, visible: false, searchable: false, },
+                        ]
+        });
+    });
+}
+
+function Reset() {
+     window.location = "/pub/list";
+}
+
+</script>
+{% endblock %}
+
+{% block slider %}
+    <div class="form-check-inline">
+        <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optradio" id="location" value="1" onclick="Station()" />Location
+        </label>
+    </div>
+    <div class="form-check-inline">
+        <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optradio" id="type" value="2" onclick="Type()";>Category
+        </label>
+    </div>
+    <div class="form-check-inline">
+        <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optradio" id="star" value="3" onclick="Star()";>Star Quality
+        </label>
+    </div>
+    <div class="form-check-inline">
+        <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="optradio" id="reset" value="4" onclick="Reset()";>Reset
+        </label>
+    </div>
+{% endblock %}
+
+{% block full_screen %}
+<div style="overflow-x:scroll">
+    <div id="table-pubs-json" style="background-color:white;" >
+    </div>
+</div>
+{% endblock %}
+
+{% block navbar_list %}<a class="nav-link active" href="/pub/list">Listing</a>{% endblock %}
+{% block pub_read_btn %}{% endblock %}
+{% block pub_edit_btn %}{% endblock %}
+{% block pub_del_btn %}{% endblock %}
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}
+{% block search_btn %}{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'navbar.html' %}
+
+{% block title %}Pub Details{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/show_map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/add_markers.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map_listen_click.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map_listen_bounds.js') }}"></script>
+<script src="{{ url_for('static', filename='js/listen_events.js') }}"></script>
+<script src="{{ url_for('static', filename='js/listen_search.js') }}"></script>
+<script src="{{ url_for('static', filename='js/class_event_handler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mouse_down_click.js') }}"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{google_key}}&libraries=places&callback=initMap" type="text/javascript"></script>
+<script>
+function onLoad(){
+    console.log("onLoad in pub_read");
+    pub_review_fields = {{ pub_review_fields | tojson }}
+    list_visible = {{ list_visible | tojson }}
+    for (i = 0; i < pub_review_fields.length; i++) {
+        if (document.getElementById(pub_review_fields[i])) {
+            document.getElementById(pub_review_fields[i]).value = pub_review[0][pub_review_fields[i]];
+        } else {
+            continue;
+        }
+    }
+}
+function initMap(){
+    console.log("initMap in pub_read");
+    pub_review = {{ pub_review | tojson }}
+<!--    console.log('pub_review: ' + pub_review[0]['pub_identity'])-->
+    key = {{ google_key | tojson }}
+    lat = pub_review[0]['latitude']
+    lng = pub_review[0]['longitude']
+    map = show_map(lat, lng, 19)
+    var icon_hole = true;
+    var info_box = false;
+    add_markers(map, "venues", pub_review)
+}
+
+function insert_line(which_list, name, type){
+
+    const form_node = document.createElement("div");
+    form_node.setAttribute("class", "form-group row");
+    id_row = "row_" + name
+    form_node.setAttribute("id", id_row);
+    document.getElementById(which_list).appendChild(form_node);
+
+    const label_node = document.createElement("label");
+    label_node.setAttribute("class", "col-sm-3 col-form-label");
+    label_node.setAttribute("for", name);
+    const textnode = document.createTextNode(name);
+    label_node.appendChild(textnode);
+    if (type == "text") {
+        document.getElementById(id_row).appendChild(label_node);
+    }
+    const div_node = document.createElement("div");
+    div_node.setAttribute("class", "col-sm-9");
+    id_div = "div_" + name
+    div_node.setAttribute("id", id_div);
+    document.getElementById(id_row).appendChild(div_node);
+
+    const input_node = document.createElement("input");
+    input_node.setAttribute("type", type);
+    input_node.setAttribute("name", name);
+    input_node.setAttribute("class", "form-control");
+    input_node.setAttribute("id", name);
+
+    document.getElementById(id_div).appendChild(input_node);
+    document.getElementById(name).readOnly = true;
+}
+</script>
+{% endblock %}
+
+{% block full_screen %}<div id="map" style="width:100%; height:350px;"></div>{% endblock %}
+
+{% block form %}
+<form action="{{ url_for('pub', pub_id=pub_review[0]['pub_identity']) }}" method="post">
+    <div class="row">
+        <div class="col-sm-11" id="visible"></div>
+        <div class="col-sm-1" id="invisible"></div>
+    </div>
+    {% for pub_review_field in pub_review_fields %}
+        {% if pub_review_field in list_visible %}
+            <script>insert_line('visible', '{{pub_review_field}}', "text")</script>
+        {% else %}
+            <script>insert_line('invisible', '{{pub_review_field}}', "hidden")</script>
+        {% endif %}
+    {% endfor %}
+</form>
+<!--<div id="score"></div>-->
+<!--<div id="star"></div>-->
+{% endblock %}
+
+{% block pub_read_btn %}<a class="nav-link active" href="{{ url_for('pub', pub_id=pub_review[0]['pub_identity']) }}">View</a>{% endblock %}</li>
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}
+
+{% block search_btn %}{% endblock %}

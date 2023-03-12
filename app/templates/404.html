@@ -1,0 +1,26 @@
+{% extends 'navbar.html' %}
+
+{% block title %}404 Error{% endblock %}
+
+{% block script %}
+<script>
+    function onLoad(){
+        console.log("onLoad in 404");
+    }
+</script>
+{% endblock %}
+
+{% block full_screen %}
+<div>
+    <h1>404 Error</h1>
+    <p id="error">{{error}}</p>
+    <p id="identity">{{identity}}</p>
+</div>{% endblock %}
+
+{% block pub_read_btn %}{% endblock %}
+{% block pub_edit_btn %}{% endblock %}
+{% block pub_del_btn %}{% endblock %}
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}

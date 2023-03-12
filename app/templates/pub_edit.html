@@ -1,0 +1,218 @@
+{% extends 'navbar.html' %}
+
+{% block title %}Edit Pub{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/show_map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/add_markers.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map_listen_click.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map_listen_bounds.js') }}"></script>
+<script src="{{ url_for('static', filename='js/listen_events.js') }}"></script>
+<script src="{{ url_for('static', filename='js/listen_search.js') }}"></script>
+<script src="{{ url_for('static', filename='js/class_event_handler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mouse_down_click.js') }}"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{google_key}}&libraries=places&callback=initMap" type="text/javascript"></script>
+<script>
+function onLoad(){
+    console.log("start of onLoad in pub_edit");
+    pub_review_fields = {{ pub_review_fields | tojson }}
+    list_visible = {{ list_visible | tojson }}
+    input_controls = {{ input_controls | tojson }}
+    dropdown_controls = {{ dropdown_controls | tojson }}
+    slider_controls = {{ slider_controls | tojson }}
+    score_list = {{ score_list | tojson }}
+    for (i = 0; i < pub_review_fields.length; i++) {
+        if (document.getElementById(pub_review_fields[i])) {
+            if (dropdown_controls.includes(pub_review_fields[i])) {
+                var dropdown_str = String(pub_review[0][pub_review_fields[i]]['0']).toUpperCase() + String(pub_review[0][pub_review_fields[i]]).substring(1)
+                document.getElementById(pub_review_fields[i]).value = dropdown_str
+            } else {
+                document.getElementById(pub_review_fields[i]).value = pub_review[0][pub_review_fields[i]];
+            }
+        } else {
+            continue;
+        }
+    }
+    slider = []
+    output = []
+    for (let i = 0; i < score_list.length; i++) {
+        slider[i] = document.getElementById(score_list[i]);
+        output[i] = document.getElementById("value_" + score_list[i]);
+        output[i].innerHTML = slider[i].value;
+
+        slider[i].oninput = function() {
+            output[i].innerHTML = document.getElementById(score_list[i]).value;
+            sum_score()
+        }
+    }
+}
+
+function sum_score(){
+    var total_score = 0
+    for (let i = 0; i < score_list.length; i++) {
+
+        total_score = total_score + Number(document.getElementById(score_list[i]).value)
+    }
+    document.getElementById("score").value = total_score
+}
+
+function mapIt(pub_review){
+
+    stations = {{ stations | tojson }}
+    key = {{ google_key | tojson }}
+    lat = pub_review[0]['latitude']
+    lng = pub_review[0]['longitude']
+    map = show_map(lat, lng, 19)
+
+    add_markers(map, "venues", pub_review)
+
+    var class_event_handler = new ClickEventHandler(map, origin, key, stations);
+    const input = document.getElementById("search-input-navbar");
+    const searchBox = new google.maps.places.SearchBox(input);
+    map_listen_click(map, stations)
+    listen_search(map, searchBox);
+    map_listen_bounds(searchBox, stations);
+    function isIconMouseEvent(e) {
+        console.log("place icon clicked")
+        return "placeId" in e;
+    }
+}
+function initMap(){
+    pub_review = {{ pub_review | tojson }}
+    mapIt({{ pub_review | tojson }})
+}
+
+function insert_line(which_list, name, type, list_required, input_controls, dropdown_controls, slider_controls){
+
+    const form_node = document.createElement("div");
+    form_node.setAttribute("class", "form-group row");
+    id_row = "row_" + name
+    form_node.setAttribute("id", id_row);
+    document.getElementById(which_list).appendChild(form_node);
+
+    const label_node = document.createElement("label");
+    label_node.setAttribute("class", "col-sm-3 col-form-label");
+    label_node.setAttribute("for", name);
+    const textnode = document.createTextNode(name);
+    label_node.appendChild(textnode);
+    if (type != "hidden") {
+        document.getElementById(id_row).appendChild(label_node);
+    }
+    if (dropdown_controls.includes(name)) {
+        const div_node = document.createElement("div");
+        div_node.setAttribute("class", "col-sm-9");
+        id_div = "div_" + name
+        div_node.setAttribute("id", id_div);
+        document.getElementById(id_row).appendChild(div_node);
+
+        const select_node = document.createElement("select");
+        select_node.setAttribute("class", "form-control");
+        select_node.setAttribute("id", name);
+        select_node.setAttribute("name", name);
+        document.getElementById(id_div).appendChild(select_node);
+
+        var option = document.createElement("option");
+        option.value = "";
+
+        if (name == "star") {
+            var options = ['Atmosphere', 'Cleanliness', 'Clientele', 'Decor', 'Entertainment', 'Food', 'Friendliness', 'Opening', 'Price', 'Selection']
+            option.text = "select the venue star quality";
+        } else {
+            var options = ['ANDY', 'AVNI', 'BOTH', 'OTHER']
+            option.text = "select the reviewer";
+        }
+        option.text = "select the venue star quality";
+        select_node.appendChild(option);
+        for (var i = 0; i < options.length; i++) {
+            var option = document.createElement("option");
+            option.value = options[i];
+            option.text = options[i];
+            select_node.appendChild(option);
+        }
+    } else if (slider_controls.includes(name)) {
+                const div_node = document.createElement("div");
+        div_node.setAttribute("class", "col-sm-7");
+        id_div = "div_" + name
+        div_node.setAttribute("id", id_div);
+        div_node.setAttribute("style", "margin: auto;");
+        document.getElementById(id_row).appendChild(div_node);
+
+        const slide_node = document.createElement("div")
+        slide_node.setAttribute("class", "slidecontainer");
+        slide_node.setAttribute("style", "margin: auto; width: 100%");
+        id_slider = "slider_div_" + name
+        slide_node.setAttribute("id", id_slider);
+        document.getElementById(id_div).appendChild(slide_node);
+
+        const input_node = document.createElement("input");
+        input_node.setAttribute("type", "range");
+        input_node.setAttribute("min", "0");
+        input_node.setAttribute("max", "10");
+        input_node.setAttribute("value", "0");
+        input_node.setAttribute("class", "slider");
+        input_node.setAttribute("id", name);
+        input_node.setAttribute("name", name);
+        input_node.setAttribute("style", "width: 100%");
+        document.getElementById(id_slider).appendChild(input_node);
+
+        const value_div_node = document.createElement("div");
+        value_div_node.setAttribute("class", "col");
+        id_value_div = "value_div_" + name
+        value_div_node.setAttribute("id", id_value_div);
+        document.getElementById(id_row).appendChild(value_div_node);
+
+        const value_node = document.createElement("div")
+        value_node.setAttribute("class", "col");
+        value_node.setAttribute("style", "font-family:copperplate; color:red; font-size:40px; margin: auto");
+        value_node.setAttribute("id", "value_" + name);
+        document.getElementById(id_value_div).appendChild(value_node);
+
+    } else {
+        const div_node = document.createElement("div");
+        div_node.setAttribute("class", "col-sm-9");
+        id_div = "div_" + name
+        div_node.setAttribute("id", id_div);
+        document.getElementById(id_row).appendChild(div_node);
+        const input_node = document.createElement("input");
+        input_node.setAttribute("type", type);
+        input_node.setAttribute("name", name);
+        input_node.setAttribute("class", "form-control");
+        input_node.setAttribute("id", name);
+        document.getElementById(id_div).appendChild(input_node);
+        if (list_required.includes(name)) {
+            document.getElementById(name).required = true;
+        }
+    }
+}
+</script>
+{% endblock %}
+
+{% block full_screen %}<div id="map" style="width:100%; height:400px;"></div>{% endblock %}
+
+{% block form %}
+<form action="{{ url_for('pub', pub_id=pub_review[0]['pub_identity']) }}" method="post">
+    <div class="row">
+        <div class="col-sm-11" id="visible"></div>
+        <div class="col-sm-1" id="invisible"></div>
+    </div>
+    {% for pub_field in pub_review_fields %}
+        {% if pub_field in list_visible %}
+            <script>insert_line('visible', '{{pub_field}}', 'text', '{{list_required}}', '{{input_controls}}', '{{dropdown_controls}}', '{{slider_controls}}')</script>
+        {% else %}
+            <script>insert_line('invisible', '{{pub_field}}', 'hidden', '{{list_required}}, '{{input_controls}}', '{{dropdown_controls}}', '{{slider_controls}}')</script>
+        {% endif %}
+    {% endfor %}
+    <div class="form-group row">
+        <button type="submit" class="btn btn-primary" name="submit" value="submit">Submit</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block image %}{% endblock %}
+
+{% block pub_edit_btn %}<a class="nav-link active" href="{{ url_for('pub_edit', pub_id=pub_review[0]['pub_identity']) }}">Edit</a>{% endblock %}
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}
+

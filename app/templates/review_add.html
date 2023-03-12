@@ -1,0 +1,102 @@
+{% extends 'navbar.html' %}
+
+{% block title %}Add New Review{% endblock %}
+
+{% block script %}
+<script>
+function onLoad(){
+    console.log("onLoad in review_add");
+    review = {{ review | tojson }}
+    review_fields = {{ review_fields | tojson }}
+    document.getElementById('identity').value = review[0]['identity']
+    document.getElementById('pub').value = review[0]['pub']
+    document.getElementById('deletion').value = review[0]['deletion']
+    document.getElementById('visit').value = review[0]['visit']
+}
+function insert_line(which_list, name, type){
+
+    const form_node = document.createElement("div");
+    form_node.setAttribute("class", "form-group row");
+    id_row = "row_" + name
+    form_node.setAttribute("id", id_row);
+    document.getElementById(which_list).appendChild(form_node);
+
+    const label_node = document.createElement("label");
+    label_node.setAttribute("class", "col-sm-3 col-form-label");
+    label_node.setAttribute("for", name);
+    const textnode = document.createTextNode(name);
+    label_node.appendChild(textnode);
+    if (type == "number") {
+        document.getElementById(id_row).appendChild(label_node);
+    }
+    const div_node = document.createElement("div");
+    div_node.setAttribute("class", "col-sm-9");
+    id_div = "div_" + name
+    div_node.setAttribute("id", id_div);
+    document.getElementById(id_row).appendChild(div_node);
+
+    if (name == 'star') {
+        const select_node = document.createElement("select");
+        select_node.setAttribute("class", "form-control");
+        select_node.setAttribute("id", "star_select");
+        select_node.setAttribute("name", "star_select");
+        document.getElementById(id_div).appendChild(select_node);
+        var options = ['Atmosphere', 'Cleanliness', 'Clientele', 'Decor', 'Entertainment', 'Food', 'Friendliness', 'Opening', 'Price', 'Selection']
+        var option = document.createElement("option");
+        option.value = "";
+        option.text = "select the venue star quality";
+        select_node.appendChild(option);
+        for (var i = 0; i < options.length; i++) {
+            var option = document.createElement("option");
+            option.value = options[i];
+            option.text = options[i];
+            select_node.appendChild(option);
+        }
+    } else {
+        const input_node = document.createElement("input");
+        if (name == 'visit' || name == 'reviewer') {
+            input_node.setAttribute("type", "text");
+        } else {
+            input_node.setAttribute("type", type);
+            input_node.setAttribute("pattern", "[0-9]*");
+            input_node.setAttribute("inputmode", "numberic");
+            input_node.setAttribute("min", "0");
+            input_node.setAttribute("max", "10");
+        }
+
+        input_node.setAttribute("name", name);
+        input_node.setAttribute("class", "form-control");
+        input_node.setAttribute("id", name);
+        document.getElementById(id_div).appendChild(input_node);
+    }
+}
+</script>
+{% endblock %}
+
+{% block image %}{% endblock %}
+
+{% block form %}
+    <form action="{{ url_for('review', pub_id=review[0]['pub']) }}" method="post">
+        <div class="row">
+            <div class="col-sm-11" id="visible"></div>
+            <div class="col-sm-1" id="invisible"></div>
+        </div>
+        {% for review_field in review_fields %}
+            {% if review_field in list_visible %}
+                <script>insert_line('visible', '{{review_field}}', "number")</script>
+            {% else %}
+                <script>insert_line('invisible', '{{review_field}}', "hidden")</script>
+            {% endif %}
+        {% endfor %}
+        <div class="form-group row">
+            <button type="submit" class="btn btn-primary" name="submit" value="submit">Submit</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block pub_edit_btn %}{% endblock %}
+{% block pub_del_btn %}{% endblock %}
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}

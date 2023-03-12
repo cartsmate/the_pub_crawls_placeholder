@@ -1,0 +1,24 @@
+{% extends 'navbar.html' %}
+
+{% block title %}Duplicate Pub{% endblock %}
+
+{% block script %}
+
+<script>
+    function onLoad() {
+        pub = {{ pub | tojson }}
+        alert("The location: " + pub[0]['name'] + "  has already been successfully added")
+
+    }
+
+</script>
+{% endblock %}
+
+{% block pub_add_btn %}{% endblock %}
+{% block pub_read_btn %}{% endblock %}
+{% block pub_edit_btn %}{% endblock %}
+{% block pub_del_btn %}{% endblock %}
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}

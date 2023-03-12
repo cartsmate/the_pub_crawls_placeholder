@@ -1,0 +1,36 @@
+{% extends 'navbar.html' %}
+
+{% block script %}
+<script>
+function onLoad(){
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("demo");
+    output.innerHTML = slider.value;
+
+    slider.oninput = function() {
+      output.innerHTML = this.value;
+    }
+}
+</script>
+{% endblock %}
+
+{% block full_screen %}
+
+<div class="col-1" style="margin: auto">
+    <div class="slidecontainer" style="margin: auto">
+      <input type="range" min="0" max="10" value="0" class="slider" id="myRange">
+    </div>
+</div>
+<div class="col">
+    <div id="demo" style="font-family:copperplate; color:red; font-size:40px; margin: auto">
+    </div>
+</div>
+{% endblock %}
+
+{% block pub_read_btn %}{% endblock %}
+{% block pub_edit_btn %}{% endblock %}
+{% block pub_del_btn %}{% endblock %}
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}

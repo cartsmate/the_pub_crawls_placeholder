@@ -1,0 +1,82 @@
+{% extends 'navbar.html' %}
+
+{% block title %}Map View{% endblock %}
+
+{% block script %}
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{google_key}}&libraries=marker&callback=initMap" type="text/javascript"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/latlng_avg.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/show_map.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/add_markers.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/add_listen_click.js') }}"></script>
+<!--<script type="text/javascript" src="{{ url_for('static', filename='js/listen_zoom.js') }}"></script>-->
+
+<script>
+function listen_zoom(map, pubs_reviews, stations, map_lat, map_lng) {
+    map.addListener('center_changed', function() {
+        console.log('center_change')
+        var center = map.getCenter();
+        map_lat = center.lat();
+        map_lng = center.lng();
+        console.log('map_lat: ' + map_lat + ' | map_lng: ' + map_lng);
+    })
+    map.addListener('zoom_changed', function() {
+        console.log('zoom_changed')
+        console.log('map_lat: ' + map_lat);
+        console.log('map_lng: ' + map_lng);
+        var newZoom = map.getZoom();
+        if (newZoom >=15){
+            showMap("venues", pubs_reviews, stations, newZoom, map_lat, map_lng)
+        } else {
+            showMap("stations", pubs_reviews, stations, newZoom, map_lat, map_lng)
+        }
+    });
+}
+function onLoad(){
+    console.log("onLoad in pub_map")
+    var map_lat = avg_lat
+    var map_lng = avg_lng
+<!--    console.log('map_lat: ' + map_lat)-->
+<!--    console.log('map_lng: ' + map_lng)-->
+<!--    console.log('map_view: ' + map_view)-->
+}
+function showMap(map_view, pubs_reviews, stations, zoom, lat, lng){
+    console.log('show map view: ' + map_view)
+    if (map_view == 'stations') {
+        data = stations
+    } else {
+        data = pubs_reviews
+    }
+    map = show_map(lat, lng, zoom)
+    add_markers(map, map_view, data);
+    add_listen_click();
+    listen_zoom(map, pubs_reviews, stations, lat, lng)
+}
+function initMap(){
+    console.log("initMap in pub_map");
+    var stations = {{ stations | tojson }};
+    var pubs_reviews = {{ pubs_reviews | tojson }};
+    var map_view = {{ map_view | tojson }}
+    if (map_view == 'stations') {
+        data = stations
+    } else {
+        data = pubs_reviews
+    }
+    let { avg_lat, avg_lng } = latlng_avg(data);
+    showMap(map_view, pubs_reviews, stations, 13, avg_lat, avg_lng)
+}
+</script>
+{% endblock %}
+
+{% block slider %}{% endblock %}
+
+{% block full_screen %}<div id="map" style="width:100%; height:450px;"></div>{% endblock %}
+
+{% block navbar_map %}<a class="nav-link active" href="/pub/map/stations">Map View</a>{% endblock %}
+{% block pub_read_btn %}{% endblock %}
+{% block pub_edit_btn %}{% endblock %}
+{% block pub_del_btn %}{% endblock %}
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}
+{% block search_btn %}{% endblock %}

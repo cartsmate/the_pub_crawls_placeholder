@@ -1,0 +1,122 @@
+{% extends 'navbar.html' %}
+
+{% block title %}Review Edit{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/show_map.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/add_markers.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/map_listen_click.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/map_listen_bounds.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/listen_events.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/listen_search.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/class_event_handler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mouse_down_click.js') }}"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{google_key}}&libraries=places&callback=initMap" type="text/javascript"></script>
+<script>
+    function onLoad(){
+        console.log("onLoad in review_edit");
+        review = {{ review | tojson }}
+        review_fields = {{ review_fields | tojson }}
+        list_visible = {{ list_visible | tojson }}
+        for (i = 0; i < review_fields.length; i++) {
+            if (document.getElementById(review_fields[i])) {
+                document.getElementById(review_fields[i]).value = review[0][review_fields[i]];
+            } else {
+                continue;
+            }
+        }
+        document.querySelector('#star_select').value = review[0]['star']
+    }
+    function initMap(){
+        pub = {{ pub | tojson }}
+        key = {{ google_key | tojson }}
+        lat = pub[0]['latitude']
+        lng = pub[0]['longitude']
+        map = show_map(lat, lng, 19)
+        add_markers(map, pub)
+    }
+</script>
+
+<script>
+    function insert_line(which_list, name, type){
+
+        const form_node = document.createElement("div");
+        form_node.setAttribute("class", "form-group row");
+        id_row = "row_" + name
+        form_node.setAttribute("id", id_row);
+        document.getElementById(which_list).appendChild(form_node);
+
+        const label_node = document.createElement("label");
+        label_node.setAttribute("class", "col-sm-3 col-form-label");
+        label_node.setAttribute("for", name);
+        const textnode = document.createTextNode(name);
+        label_node.appendChild(textnode);
+        if (type == "number") {
+            document.getElementById(id_row).appendChild(label_node);
+        }
+        const div_node = document.createElement("div");
+        div_node.setAttribute("class", "col-sm-9");
+        id_div = "div_" + name
+        div_node.setAttribute("id", id_div);
+        document.getElementById(id_row).appendChild(div_node);
+
+        if (name == 'star') {
+            const select_node = document.createElement("select");
+            select_node.setAttribute("class", "form-control");
+            select_node.setAttribute("id", "star_select");
+            select_node.setAttribute("name", "star_select");
+            document.getElementById(id_div).appendChild(select_node);
+            var options = ['Atmosphere', 'Cleanliness', 'Clientele', 'Decor', 'Entertainment', 'Food', 'Friendliness', 'Opening', 'Price', 'Selection']
+            for (var i = 0; i < options.length; i++) {
+                var option = document.createElement("option");
+                option.value = options[i];
+                option.text = options[i];
+                select_node.appendChild(option);
+            }
+        } else {
+            const input_node = document.createElement("input");
+            if (name == 'visit' || name == 'reviewer') {
+                input_node.setAttribute("type", "text");
+            } else {
+                input_node.setAttribute("type", type);
+                input_node.setAttribute("pattern", "[0-9]*");
+                input_node.setAttribute("inputmode", "numberic");
+                input_node.setAttribute("min", "0");
+                input_node.setAttribute("max", "10");
+            }
+            input_node.setAttribute("name", name);
+            input_node.setAttribute("class", "form-control");
+            input_node.setAttribute("id", name);
+            document.getElementById(id_div).appendChild(input_node);
+        }
+    }
+</script>
+{% endblock %}
+
+{% block full_screen %}<div id="map" style="width:100%; height:400px;"></div>{% endblock %}
+
+{% block form %}
+    <form action="{{ url_for('review', pub_id=review[0]['pub']) }}" method="post">
+        <div class="row">
+            <div class="col-sm-11" id="visible"></div>
+            <div class="col-sm-1" id="invisible"></div>
+        </div>
+        {% for review_field in review_fields %}
+            {% if review_field in list_visible %}
+                <script>insert_line('visible', '{{review_field}}', "number")</script>
+            {% else %}
+                <script>insert_line('invisible', '{{review_field}}', "hidden")</script>
+            {% endif %}
+        {% endfor %}
+        <div class="form-group row">
+            <button type="submit" class="btn btn-primary" name="submit" value="submit">Submit</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block pub_edit_btn %}{% endblock %}
+{% block pub_del_btn %}{% endblock %}
+{% block rev_read_btn %}{% endblock %}
+{% block rev_add_btn %}{% endblock %}
+{% block rev_edit_btn %}{% endblock %}
+{% block rev_del_btn %}{% endblock %}

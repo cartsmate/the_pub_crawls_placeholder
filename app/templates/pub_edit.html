@@ -199,7 +199,7 @@ function insert_line(which_list, name, type, list_required, input_controls, drop
         {% if pub_field in list_visible %}
             <script>insert_line('visible', '{{pub_field}}', 'text', '{{list_required}}', '{{input_controls}}', '{{dropdown_controls}}', '{{slider_controls}}')</script>
         {% else %}
-            <script>insert_line('invisible', '{{pub_field}}', 'hidden', '{{list_required}}, '{{input_controls}}', '{{dropdown_controls}}', '{{slider_controls}}')</script>
+            <script>insert_line('invisible', '{{pub_field}}', 'hidden', '{{list_required}}', '{{input_controls}}', '{{dropdown_controls}}', '{{slider_controls}}')</script>
         {% endif %}
     {% endfor %}
     <div class="form-group row">

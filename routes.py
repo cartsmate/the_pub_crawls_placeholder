@@ -2,14 +2,11 @@ import os
 import json
 import uuid
 import pandas as pd
-from datetime import date
 from flask import Blueprint, render_template, request, redirect, url_for
 from configparser import ConfigParser
 from config import Configurations
 from functions import Functions
-from models.pub import Pub
 from models.review import Review
-import app
 
 directory_path = os.getcwd()
 constants = ConfigParser()
@@ -34,7 +31,7 @@ home_blueprint = Blueprint()
 #                            row_loop=range(3), col_loop=range(4))
 
 
-@app.route("/pub/map")
+@the_pub_crawls.route("/pub/map")
 def pub_map():
     print('/pub/map')
     df_stations = function.get_stations()
@@ -78,7 +75,7 @@ def pub_map():
 #                            pubs_reviews=pubs_reviews_json, icon_hole=False,
 #                            info_box=False, map_view=view, map_lat=51.5, map_lng=-0.1)
 
-@app.route("/pub/list")
+@the_pub_crawls.route("/pub/list")
 def pub_list():
     print('/pub/list')
     # pubs_json = df_to_dict(get_pubs())
@@ -353,7 +350,7 @@ def pub_list():
 #         #     return render_template('404.html', error=e)
 
 
-@app.route("/review/<pub_id>", methods=['GET', 'POST'])
+@the_pub_crawls.route("/review/<pub_id>", methods=['GET', 'POST'])
 def review(pub_id):
     print('/review/<pub_id>')
     # try:
@@ -452,7 +449,7 @@ def review(pub_id):
     #     return render_template('404.html', error=e)
 
 
-@app.route("/review/add/<pub_id>")
+@the_pub_crawls.route("/review/add/<pub_id>")
 def review_add(pub_id):
     print('/review/add/<pub_id>')
     # try:
@@ -472,7 +469,7 @@ def review_add(pub_id):
     #     return render_template('404.html', error=e)
 
 
-@app.route("/review/edit/<pub_id>", methods=['GET', 'POST'])
+@the_pub_crawls.route("/review/edit/<pub_id>", methods=['GET', 'POST'])
 def review_edit(pub_id):
     print('/review/edit/<pub_id>"')
     # try:
@@ -499,7 +496,7 @@ def review_edit(pub_id):
     #     return render_template('404.html', error=e)
 
 
-@app.route("/review/delete/<pub_id>")
+@the_pub_crawls.route("/review/delete/<pub_id>")
 def review_delete(pub_id):
     print('/review/delete/<pub_id>')
     # print('pub_id: ' + str(pub_id))
@@ -543,7 +540,7 @@ def review_delete(pub_id):
     #     return render_template('404.html', error=e)
 
 
-@app.route("/pub/star/<star_id>")
+@the_pub_crawls.route("/pub/star/<star_id>")
 def star(star_id):
     print('/pub/star/<star_id>')
     df_pubs_by_star = function.get_pubs_by_star(star_id)
@@ -553,7 +550,7 @@ def star(star_id):
     return render_template('pub_list.html', pubs_reviews=pubs_rev_star_json, map_view=view, map_lat=51.5, map_lng=-0.1)
 
 
-@app.route("/pub/location/<loc_id>")
+@the_pub_crawls.route("/pub/location/<loc_id>")
 def location(loc_id):
     print('/pub/location/<loc_id>')
     df_pubs_by_station = function.get_pubs_by_station(loc_id)
@@ -563,7 +560,7 @@ def location(loc_id):
     return render_template('pub_list.html', pubs_reviews=pubs_rev_loc_json, map_view=view, map_lat=51.5, map_lng=-0.1)
 
 
-@app.route("/pub/category/<cat_id>")
+@the_pub_crawls.route("/pub/category/<cat_id>")
 def category(cat_id):
     print('/pub/category/<cat_id>')
     df_pubs_by_category = function.get_pubs_by_category(cat_id)

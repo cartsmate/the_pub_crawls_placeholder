@@ -4,7 +4,6 @@ import uuid
 import boto3
 import numpy as np
 import pandas as pd
-from app import *
 from .config import Configurations
 
 config = Configurations().get_config()
